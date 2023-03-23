@@ -1,6 +1,6 @@
 (ns senju.core
   (:require
-   [bidi.ring :refer [make-handler ->Redirect]]
+   [bidi.ring :refer [make-handler ->Redirect ->ResourcesMaybe ->Files]]
    [ring.adapter.jetty :as jetty]
    [ring.util.response :as res]
    [clojure.java.io :as io]
@@ -26,12 +26,17 @@
   {:status 404})
 
 (def routes
-  ["/" {"" (->Redirect 307 index)
-        "index.html" #'index
+  ["/" {;"" (->Redirect 307 index)
+        ;"index.html" #'index
+        "" (->ResourcesMaybe {:prefix "public/"})
+        ; FIX: how to redirect "/" to public/index.html in the resource?
         "api/" {"test" #'api-test}
-        true #'not-found}
-   ; "/resources" (->ResourcesMaybe {:prefix "public/"})
-   ; "pics/" (->Files {:dir "/tmp/pics"})
+        "pics/" (->Files {:dir "/tmp/pics"})
+        ; "css/" (->Resources {:prefix "public/css/"})
+        ; "img/" (->Resources {:prefix "public/img/"})
+        ; "js/" (->Resources {:prefix "public/js/"})
+        true #'not-found
+        }
    ])
 
 (defn config
@@ -60,5 +65,6 @@
 
  (config)
  (go (config))
+ (clojure.java.io/resource "public/css/reset.css")
 
  )

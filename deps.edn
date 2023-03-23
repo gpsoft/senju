@@ -1,7 +1,7 @@
-{:paths ["src/clj" "src/cljc"]
+{:paths ["src/clj" "src/cljc" "resources"]
  :deps {ring/ring-core {:mvn/version "1.9.6"}
         ring/ring-jetty-adapter {:mvn/version "1.9.6"}
-        bidi {:mvn/version "2.1.6"}}
+        bidi/bidi {:mvn/version "2.1.6"}}
 
  :aliases
  {:dev {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}}

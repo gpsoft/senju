@@ -1,0 +1,15 @@
+{
+	"name": "senju",
+	"scripts": {
+		"watch": "npx shadow-cljs watch app",
+		"release": "npx shadow-cljs release app"
+	},
+	"dependencies": {
+		"highlight.js": "10.7.2",
+		"react": "18.2.0",
+		"react-dom": "18.2.0"
+	},
+	"devDependencies": {
+		"shadow-cljs": "2.22.7"
+	}
+}

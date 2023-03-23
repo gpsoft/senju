@@ -11,5 +11,8 @@
 ### Clojure
 
 ```
+clj -M:dev
+clj -M -m senju.core
+clj -T:build clean
 clj -T:build uber
 ```

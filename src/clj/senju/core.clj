@@ -3,3 +3,7 @@
 
 (defn -main [& args]
   (println "hey"))
+
+(comment
+ (-main)
+ )

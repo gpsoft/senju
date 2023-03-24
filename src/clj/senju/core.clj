@@ -11,9 +11,14 @@
   {:port 8080
    })
 
+(def res-404 (res/not-found ""))
+
+(def storage-path "/tmp/pics/")
+
 (defn- index
   [_]
-  (res/response (slurp (io/resource "public/index.html"))))
+  (or (res/resource-response "public/index.html")
+      res-404))
 
 (defn- api-test
   [_]
@@ -21,26 +26,34 @@
    :headers {}
    :body "Good"})
 
+(defn- storage
+  [m]
+  (let [path (get-in m [:route-params :storage-file])]
+    (or (res/file-response (str storage-path path))
+        res-404)))
+
 (defn- not-found
   [_]
-  {:status 404})
+  res-404)
 
 (def routes
   [
-   "/" {"" (bidi/->Redirect 307 index)
-        "index.html" #'index
-        "api/" {"test" #'api-test}
-        "pics/" (bidi/->Files {:dir "/tmp/pics"})
-        "css/" (bidi/->Resources {:prefix "public/css/"})
-        "img/" (bidi/->Resources {:prefix "public/img/"})
-        "js/" (bidi/->Resources {:prefix "public/js/"})
-        ;; FIX:
-        ;; イマイチ。やりたいことは…
+   "/" [["" (bidi/->Redirect 307 index)]
+        ["index.html" index]
+        ["api/" {"test" api-test}]
+        [["storage/" :storage-file] storage]
+        ["css/" (bidi/->Resources {:prefix "public/css/"})]
+        ["img/" (bidi/->Resources {:prefix "public/img/"})]
+        ["js/" (bidi/->Resources {:prefix "public/js/"})]
+        ;; FIX: 冗長?
+        ;; やりたいことは…
         ;; ・publicの下のリソースは /css/reset.css のようなURLで公開
         ;; ・/index.htmlもリソース
         ;; ・"/"は"index.html"へリダイレクト
-        true #'not-found
-        }
+        ["favicon" (bidi/->Resources {:prefix "public/favicon"})]
+        ;; FIX: トリッキー
+        ;; favicon.icoをリソースから探してほしいんだけど…
+        [true not-found]]
    ])
 
 (defn config
@@ -73,6 +86,10 @@
  (clojure.java.io/resource "public/css/reset.css")
 
  (do (require '[bidi.bidi :refer [match-route]])
-     (match-route routes "/index.html"))
+     (match-route routes "/")
+     (match-route routes "/index.html")
+     (match-route routes "/favicon.ico")
+     (match-route routes "/js/compiled/app.js")
+     (match-route routes "/css/reset.css"))
 
  )

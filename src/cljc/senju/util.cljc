@@ -1,9 +1,11 @@
 (ns senju.util
   (:require
    #?(:clj [clojure.java.io :as io])
+   #?(:clj [clojure.pprint :as pprint]
+      :cljs [cljs.pprint :as pprint])
    [clojure.edn :as edn]))
 
-(defn tap [v] (prn v) v)
+(defn tap [v] (pprint/pprint v) v)
 
 #?(:clj (defn mac-os?
           []

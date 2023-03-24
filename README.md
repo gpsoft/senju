@@ -22,7 +22,7 @@
 ```
 $ clj -M:dev
 $ vim src/clj/senju/core.clj
-  :Connect 5876
+  :Connect 5876 src/clj
 
 $ clj -M -m senju.core
 
@@ -35,8 +35,9 @@ $ clj -T:build uber
 ```
 $ npm install
 $ npm run watch
+$ firefox http://localhost:8280
 $ vim src/cljs/senju/core.cljs
-  :Connect 5877 . | CljEval (shadow/repl :app)
+  :Connect 5877 src/cljs | CljEval (shadow/repl :app)
 
 $ npm run release
 ```

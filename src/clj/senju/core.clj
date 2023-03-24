@@ -5,6 +5,7 @@
    [ring.util.response :as res]
    [ring.middleware.defaults :refer [wrap-defaults api-defaults site-defaults]]
    [ring.middleware.json :refer [wrap-json-body wrap-json-response]]
+   [ring.middleware.cors :refer [wrap-cors]]
    [clojure.java.io :as io]
    [senju.util :as u])
   (:gen-class))
@@ -27,8 +28,8 @@
   (res/response {:result "Okay" :message "Good!"}))
 
 (defn- hey-app
-  [ch m]
-  (res/response {:res :hey-app :ch ch}))
+  [ch params]
+  (res/response {:res :hey-app :ch ch :msg (:message params)}))
 
 (defn- yo-app
   [ch m]
@@ -39,7 +40,7 @@
   (let [apps {:hey #'hey-app
               :yo #'yo-app}
         {:keys [app ch]} (:route-params m)
-        response ((app apps) ch m)]
+        response ((app apps) ch (:body m))]
     (or response res-404)))
 
 (defn- storage
@@ -87,6 +88,8 @@
   (let [api-h (-> (bidi/make-handler api-routes)
                   (wrap-json-body {:keywords? true})
                   wrap-json-response
+                  (wrap-cors :access-control-allow-origin [#"http://localhost:8280"]  ;; CORS for dev
+                             :access-control-allow-methods [:get :put :post])
                   (wrap-defaults api-defaults))
         site-h (-> (bidi/make-handler site-routes)
                    (wrap-defaults site-defaults))]

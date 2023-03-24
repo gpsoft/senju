@@ -33,8 +33,10 @@ $ clj -T:build uber
 ### ClojureScript
 
 ```
-npm install
-npm run watch
+$ npm install
+$ npm run watch
+$ vim src/cljs/senju/core.cljs
+  :Connect 5877 . | CljEval (shadow/repl :app)
 
-npm run release
+$ npm run release
 ```

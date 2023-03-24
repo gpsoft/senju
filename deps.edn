@@ -4,7 +4,10 @@
         ring/ring-defaults {:mvn/version "0.3.4"}
         ring/ring-json {:mvn/version "0.5.1"}
         ring-cors/ring-cors {:mvn/version "0.1.13"}
-        bidi/bidi {:mvn/version "2.1.6"}}
+        bidi/bidi {:mvn/version "2.1.6"}
+
+        ; org.slf4j/slf4j-nop {:mvn/version "RELEASE"}
+        }
 
  :aliases
  {:dev {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}}

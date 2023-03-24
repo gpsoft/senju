@@ -3,7 +3,10 @@
    #?(:clj [clojure.java.io :as io])
    #?(:clj [clojure.pprint :as pprint]
       :cljs [cljs.pprint :as pprint])
-   [clojure.edn :as edn]))
+   [clojure.edn :as edn])
+  #?(:clj (:import
+           [java.awt Desktop]
+           [java.net URI])))
 
 (defn tap [v] (pprint/pprint v) v)
 
@@ -24,6 +27,12 @@
                   (slurp)
                   (edn/read-string))
               {}))))
+
+#?(:clj (defn open-browser!
+          [url-str]
+          (let [desktop (Desktop/getDesktop)
+                uri (new URI url-str)]
+            (.browse desktop uri))))
 
 (defn move-ix
   [ix n forward?]

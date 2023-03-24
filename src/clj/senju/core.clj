@@ -105,7 +105,8 @@
    (let [app (application)
          opts {:port port
                :join? false}]
-     (jetty/run-jetty app opts))))
+     (jetty/run-jetty app opts)
+     (u/open-browser! (str "http://localhost:" port "/")))))
 
 (defn -main [& args]
   (-> (config)

@@ -1,6 +1,6 @@
 (ns senju.core
   (:require
-   [bidi.ring :refer [make-handler ->Redirect ->ResourcesMaybe ->Files]]
+   [bidi.ring :as bidi]
    [ring.adapter.jetty :as jetty]
    [ring.util.response :as res]
    [clojure.java.io :as io]
@@ -13,7 +13,7 @@
 
 (defn- index
   [_]
-  (res/response "Index!"))
+  (res/response (slurp (io/resource "public/index.html"))))
 
 (defn- api-test
   [_]
@@ -26,15 +26,19 @@
   {:status 404})
 
 (def routes
-  ["/" {;"" (->Redirect 307 index)
-        ;"index.html" #'index
-        "" (->ResourcesMaybe {:prefix "public/"})
-        ; FIX: how to redirect "/" to public/index.html in the resource?
+  [
+   "/" {"" (bidi/->Redirect 307 index)
+        "index.html" #'index
         "api/" {"test" #'api-test}
-        "pics/" (->Files {:dir "/tmp/pics"})
-        ; "css/" (->Resources {:prefix "public/css/"})
-        ; "img/" (->Resources {:prefix "public/img/"})
-        ; "js/" (->Resources {:prefix "public/js/"})
+        "pics/" (bidi/->Files {:dir "/tmp/pics"})
+        "css/" (bidi/->Resources {:prefix "public/css/"})
+        "img/" (bidi/->Resources {:prefix "public/img/"})
+        "js/" (bidi/->Resources {:prefix "public/js/"})
+        ;; FIX:
+        ;; イマイチ。やりたいことは…
+        ;; ・publicの下のリソースは /css/reset.css のようなURLで公開
+        ;; ・/index.htmlもリソース
+        ;; ・"/"は"index.html"へリダイレクト
         true #'not-found
         }
    ])
@@ -44,13 +48,14 @@
   (->> (u/read-edn "." "config.edn")
        (merge default-config)))
 
-(defn application
+(defn- application
   []
-  (-> (make-handler routes)
+  (-> (bidi/make-handler routes)
       #_wrap-hoge))
 
-(defn go
-  ([cfg] (go cfg false))
+
+(defn go!
+  ([cfg] (go! cfg false))
   ([{:keys [port] :as cfg} from-main?]
    (let [app (application)
          opts {:port port
@@ -59,12 +64,15 @@
 
 (defn -main [& args]
   (-> (config)
-      (go true)))
+      (go! true)))
 
 (comment
 
  (config)
- (go (config))
+ (go! default-config)
  (clojure.java.io/resource "public/css/reset.css")
+
+ (do (require '[bidi.bidi :refer [match-route]])
+     (match-route routes "/index.html"))
 
  )

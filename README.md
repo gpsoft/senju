@@ -21,7 +21,7 @@
 
 ```
 $ clj -M:dev
-$ vim src/clj/senju.core
+$ vim src/clj/senju/core.clj
   :Connect 5876
 
 $ clj -M -m senju.core

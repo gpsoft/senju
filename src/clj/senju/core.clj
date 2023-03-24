@@ -3,6 +3,8 @@
    [bidi.ring :as bidi]
    [ring.adapter.jetty :as jetty]
    [ring.util.response :as res]
+   [ring.middleware.defaults :refer [wrap-defaults api-defaults site-defaults]]
+   [ring.middleware.json :refer [wrap-json-body wrap-json-response]]
    [clojure.java.io :as io]
    [senju.util :as u])
   (:gen-class))
@@ -22,9 +24,23 @@
 
 (defn- api-test
   [_]
-  {:status 200
-   :headers {}
-   :body "Good"})
+  (res/response {:result "Okay" :message "Good!"}))
+
+(defn- hey-app
+  [ch m]
+  (res/response {:res :hey-app :ch ch}))
+
+(defn- yo-app
+  [ch m]
+  (res/response {:res :yo-app :ch ch}))
+
+(defn- api-dispatch
+  [m]
+  (let [apps {:hey #'hey-app
+              :yo #'yo-app}
+        {:keys [app ch]} (:route-params m)
+        response ((app apps) ch m)]
+    (or response res-404)))
 
 (defn- storage
   [m]
@@ -36,11 +52,10 @@
   [_]
   res-404)
 
-(def routes
+(def site-routes
   [
    "/" [["" (bidi/->Redirect 307 index)]
         ["index.html" index]
-        ["api/" {"test" api-test}]
         [["storage/" :storage-file] storage]
         ["css/" (bidi/->Resources {:prefix "public/css/"})]
         ["img/" (bidi/->Resources {:prefix "public/img/"})]
@@ -56,6 +71,12 @@
         [true not-found]]
    ])
 
+(def api-routes
+  [
+   "/api" {"/test" api-test
+           ["/" [keyword :app] "/" [keyword :ch]] api-dispatch}
+   ])
+
 (defn config
   []
   (->> (u/read-edn "." "config.edn")
@@ -63,8 +84,16 @@
 
 (defn- application
   []
-  (-> (bidi/make-handler routes)
-      #_wrap-hoge))
+  (let [api-h (-> (bidi/make-handler api-routes)
+                  (wrap-json-body {:keywords? true})
+                  wrap-json-response
+                  (wrap-defaults api-defaults))
+        site-h (-> (bidi/make-handler site-routes)
+                   (wrap-defaults site-defaults))]
+    (fn [req]
+      (if-let [response (api-h req)]
+        response
+        (site-h req)))))
 
 
 (defn go!
@@ -86,10 +115,10 @@
  (clojure.java.io/resource "public/css/reset.css")
 
  (do (require '[bidi.bidi :refer [match-route]])
-     (match-route routes "/")
-     (match-route routes "/index.html")
-     (match-route routes "/favicon.ico")
-     (match-route routes "/js/compiled/app.js")
-     (match-route routes "/css/reset.css"))
+     (match-route site-routes "/")
+     (match-route site-routes "/index.html")
+     (match-route site-routes "/favicon.ico")
+     (match-route site-routes "/js/compiled/app.js")
+     (match-route site-routes "/css/reset.css"))
 
  )

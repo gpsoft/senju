@@ -3,6 +3,8 @@
    [re-frame.core :as r]
    [senju.routes :refer [rev-route]]
    [senju.styles :as styles]
+   [senju.album.views :refer [album-main]]
+   [senju.util :as u]
    ))
 
 (defn- current-page
@@ -11,11 +13,11 @@
     (fn []
       (case @curpage
         :menu-page [:div
-                    [:h1 "Menu"]
-                    [:a {:href (rev-route :album)} "view photo album"]]
-        :album-page [:div
-                     [:p "Showing photo album"]
-                     [:a {:href (rev-route :menu)} "back to menu"]]
+                    [:h1 "メニュー"]
+                    [:div.menu-wrap
+                     [:a.menu-item
+                      {:href (rev-route :album)} "・写真アルバム"]]]
+        :album-page [album-main]
         [:div "Unexpected page"]))))
 
 (defn main-ui

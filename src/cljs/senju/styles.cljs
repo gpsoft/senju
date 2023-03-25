@@ -8,8 +8,8 @@
 
 (defglobal defaults
   [:body
-   {:color               color-text-main
-    :background-color    color-main
+   {:color color-text-main
+    :background-color color-main
     :font-size :16px
     }]
   [:#app
@@ -19,5 +19,13 @@
   [:.main-container
    {:padding :8px
     ; :background-color color-accent
+    }]
+  [:.menu-wrap
+   {
+    }]
+  [:.menu-item
+   {
+    :text-decoration :none
+    :color color-text-main
     }]
   )

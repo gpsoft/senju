@@ -2,6 +2,7 @@
   (:require
    [re-frame.core :as r]
    [senju.routes :refer [rev-route]]
+   [senju.styles :as styles]
    ))
 
 (defn- current-page
@@ -19,5 +20,5 @@
 
 (defn main-ui
   []
-  [:div
+  [:div.main-container
    [current-page]])

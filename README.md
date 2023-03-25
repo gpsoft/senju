@@ -25,9 +25,6 @@ $ vim src/clj/senju/core.clj
   :Connect 5876 src/clj
 
 $ clj -M -m senju.core
-
-$ clj -T:build clean
-$ clj -T:build uber
 ```
 
 ### ClojureScript
@@ -38,6 +35,12 @@ $ npm run watch
 $ firefox http://localhost:8280
 $ vim src/cljs/senju/core.cljs
   :Connect 5877 src/cljs | CljEval (shadow/repl :app)
+```
 
+### Release
+
+```
 $ npm run release
+$ clj -T:build clean
+$ clj -T:build uber
 ```

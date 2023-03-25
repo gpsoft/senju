@@ -21,12 +21,17 @@
         (r/dispatch [:move-to-page page]))))
    pushy/start!))
 
+(defn ^:dev/after-load mount-root []
+  ;; ↑このメタデータが重要 (Shadow-cljsのafter-loadフック)
+  (r/clear-subscription-cache!)
+  ; (reagent.dom/unmount-component-at-node root-el)
+  (render [views/main-ui]
+          (dom/sel1 :#app)))
+
 (defn init []
   (init-routes!)
   (r/dispatch-sync [:initialize-db])
-  (r/clear-subscription-cache!)
-  (render [views/main-ui]
-          (dom/sel1 :#app)))
+  (mount-root))
 
 (comment
 
